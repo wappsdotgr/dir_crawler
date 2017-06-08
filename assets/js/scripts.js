@@ -48,16 +48,16 @@ $(document).ready(function(){
 		var zn;
 		$.ajax({
 			url: 'system/zip.php',
-			data: 'bp=' + $('#path').val(),
+			data: 'bp=' + $('#path').val() + '&exts=' + $('#exts').val(),
 			type: 'POST',
 			success: function(data) {
-				// console.log(data);
 				zn = data;
-				window.open('system/'+ data, '_blank');
+				$('body').append('<iframe src="system/' + data + '" class="dn"></iframe>');
 			},
 			complete: function(data) {
 				// console.log(data);
-				window.open('system/dzip.php?zn='+ zn, '_blank');
+				$('body').append('<iframe src="system/dzip.php?zn=' + zn + '" class="dn"></iframe>');
+				setTimeout(function(){$('iframe').remove();}, 1000);
 			}
 		});
 	});

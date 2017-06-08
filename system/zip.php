@@ -2,6 +2,7 @@
 
 # Check Path 'isset'
 $bp = (isset($_POST['bp']) && $_POST['bp'] != '') ? $_POST['bp'] : die('Path not specified.');
+$exts = (isset($_POST['exts']) && $_POST['exts'] != '') ? explode(',', $_POST['exts']) : null;
 
 # Declare Iterator
 $iter = new RecursiveIteratorIterator(
@@ -13,23 +14,19 @@ $iter = new RecursiveIteratorIterator(
 # Scan + Prepare
 $paths = array($bp);
 foreach ($iter as $path => $dir) {
-	$paths[] = str_replace($bp."\\", "", $path);
+	if ($exts !== null && !in_array(pathinfo($path, PATHINFO_EXTENSION), $exts) && is_file($path)) {
+		unset($paths[$path]);
+	} else {
+		$paths[] = str_replace($bp."\\", "", $path);
+	}
 }
 
-// Remove Base + Sort
+# Remove Base + Sort
 $paths = array_diff($paths, array($bp));
 sort($paths);
 
-# Return
-
-$output = str_replace($bp."\\", "", implode("\n", $paths));
-
-// echo implode("\n", $paths);
-
-
 # Create Zip + Add Files
-// $zipname = date('Ymd').' - Movies.zip';
-$zipname = 'kati.zip';
+$zipname = 'backup.zip';
 $zip = new ZipArchive;
 $zip->open($zipname, ZipArchive::CREATE);
 foreach ($paths as $zpath) {
@@ -42,7 +39,7 @@ foreach ($paths as $zpath) {
 }
 $zip->close();
 
-
+# Return
 echo $zipname;
 
 /*
